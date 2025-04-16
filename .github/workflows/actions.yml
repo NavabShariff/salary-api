@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Sonar Scan
-        uses: github.com/NavabShariff/shared-library/.github/actions/sonar-scan@v1.0.0
+        uses: github.com/NavabShariff/shared-library/.github/actions/sonar-scan@main
         with:
           projectName: ${{ github.event.repository.name }}
           projectKey: ${{ github.event.repository.name }}
