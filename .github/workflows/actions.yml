@@ -16,6 +16,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Maven
+        run: |
+          apt-get update
+          apt-get install -y maven
+
+      - name: Build Java project
+        run: mvn clean package -DskipTests
+
       - name: Run Sonar Scan
         uses: NavabShariff/shared-library/.github/actions/sonar-scan@main
         with:
