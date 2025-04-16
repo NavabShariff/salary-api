@@ -70,6 +70,57 @@ Once the schema, table and database is configured, we can start our application 
 java -jar target/salary-0.1.0-RELEASE.jar
 ```
 
+## run using docker
+
+First update redis and scylladb endpoints in `application.yml`
+
+```       
+vim src/main/resources/application.yml
+```
+
+Update cassandra `contact-points` and redis `host` fields 
+
+```
+spring:
+  cassandra:
+    keyspace-name: employee_db
+    contact-points: scylladb
+    port: 9042
+    username: scylladb
+    password: password
+    local-datacenter: datacenter1
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: password
+```
+
+Now create `init-scylla.cql` file with below content
+
+```
+CREATE KEYSPACE IF NOT EXISTS employee_db
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+USE employee_db;
+
+DROP TABLE IF EXISTS employee_salary;
+
+CREATE TABLE employee_salary (
+    id text PRIMARY KEY,
+    name text,
+    salary float,
+    process_date text,
+    status text
+);
+```
+
+Now  deploy api using below docker compose command
+
+```
+docker compose -f docker-compose.yaml up -d
+```
+
 ## Endpoint Information
 
 | **Endpoint**                   | **Method** | **Description**                                                                               |

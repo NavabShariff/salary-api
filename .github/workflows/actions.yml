@@ -1,0 +1,25 @@
+name: Salary API Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  sonar-analysis:
+    runs-on: ubuntu-latest
+
+    container:
+      image: sonarsource/sonar-scanner-cli:latest
+      options: --user root
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Sonar Scan
+        uses: github.com/NavabShariff/shared-library/.github/actions/sonar-scan@v1.0.0
+        with:
+          projectName: ${{ github.event.repository.name }}
+          projectKey: ${{ github.event.repository.name }}
+          sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
+          sonarToken: ${{ secrets.SONAR_TOKEN }}
