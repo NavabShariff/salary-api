@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 env:
-  coverage_report_path: 'jacoco-coverage.xml'
+  coverage_report_path: 'code-coverage.xml'
 
 jobs:
 
