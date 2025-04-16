@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "main" ]
 
+env:
+  coverage_report_path: 'index.html'
+  
 jobs:
 
   sonar-scan:
@@ -22,6 +25,7 @@ jobs:
           projectKey: ${{ github.event.repository.name }}
           sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
           sonarToken: ${{ secrets.SONAR_TOKEN }}
+          coverageReportPath: ${{ env.coverage_report_path }}
 
   # build:
   #   runs-on: ubuntu-latest
