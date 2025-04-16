@@ -5,11 +5,12 @@ on:
     branches: [ "main" ]
 
 env:
-  coverage_report_path: 'index.html'
-  
+  coverage_report_path: 'jacoco-coverage.xml'
+
 jobs:
 
   sonar-scan:
+
     runs-on: ubuntu-latest
     container:
       image: maven:3.9-eclipse-temurin-17
