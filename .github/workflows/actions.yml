@@ -16,13 +16,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Maven Build and SonarQube Scan
-        uses: NavabShariff/shared-library/.github/actions/sonar-scan-maven@main
+        uses: NavabShariff/shared-library/.github/actions/sonar-scan@main
         with:
           projectName: ${{ github.event.repository.name }}
           projectKey: ${{ github.event.repository.name }}
           sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
           sonarToken: ${{ secrets.SONAR_TOKEN }}
-          
+
   # build:
   #   runs-on: ubuntu-latest
 
