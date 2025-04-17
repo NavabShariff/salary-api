@@ -33,6 +33,11 @@ jobs:
           name: source-code
           path: source-code
 
+      - name: Run Maven Compile
+        run: |
+          cd source-code
+          mvn clean compile -DskipTests
+
       - name: Run Maven Sonar Scan
         run: |
           cd source-code
