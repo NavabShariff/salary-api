@@ -156,7 +156,7 @@ jobs:
 
       - name: Update Image Tag in deployment.yaml
         run: |
-          sed -i "s|\(${{ needs.docker-build-push.outputs.image-name }}:\)[^ ]*|\1${{ needs.docker-build-push.outputs.image-tag }}|" ${{github.repository_name }}/deployment.yaml
+          sed -i "s|\(${{ needs.docker-build-push.outputs.image-name }}:\)[^ ]*|\1${{ needs.docker-build-push.outputs.image-tag }}|" ${{ github.event.repository.name }}/deployment.yaml
 
       - name: Commit updated deployment.yaml
         run: |
