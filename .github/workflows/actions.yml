@@ -1,4 +1,4 @@
-name: Salary API Pipeline
+name: Salary API CI/CD Pipeline
 
 on:
   push:
@@ -19,37 +19,31 @@ env:
 
 jobs:
 
-  # sonar-scan:
+  sonar-scan:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9-eclipse-temurin-17
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-  #   runs-on: ubuntu-latest
-
-  #   container:
-  #     image: maven:3.9-eclipse-temurin-17
-
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v4
-
-  #     - name: Run Maven Build and SonarQube Scan
-  #       uses: NavabShariff/shared-library/.github/actions/sonar-scan@main
-  #       with:
-  #         language: ${{ env.language }}
-  #         projectName: ${{ github.event.repository.name }}
-  #         projectKey: ${{ github.event.repository.name }}
-  #         sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
-  #         sonarToken: ${{ secrets.SONAR_TOKEN }}
-  #         coverageReportPath: ${{ env.coverage_report_path }}
-  #         qualityGateWait: ${{ env.qualityGateWait }}
+      - name: Run Maven Build and SonarQube Scan
+        uses: NavabShariff/shared-library/.github/actions/sonar-scan@main
+        with:
+          language: ${{ env.language }}
+          projectName: ${{ github.event.repository.name }}
+          projectKey: ${{ github.event.repository.name }}
+          sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
+          sonarToken: ${{ secrets.SONAR_TOKEN }}
+          coverageReportPath: ${{ env.coverage_report_path }}
+          qualityGateWait: ${{ env.qualityGateWait }}
 
   docker-build-and-push:
     runs-on: ubuntu-latest
-    # needs: sonar-scan
-
+    needs: sonar-scan
     steps:
       - uses: actions/checkout@v4
-
       # ghcr
-  
       - name: Set image names 
         if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
         run: |
@@ -131,7 +125,7 @@ jobs:
         with:
           image_name: ${{ env.image_name }}
           tag: ${{ env.commit_sha }}
-          severity_threshold: 1 # You can adjust the threshold as needed
+          severity_threshold: 5 # You can adjust the threshold as needed
 
       - name: Review Trivy Scan Result
         run: |
