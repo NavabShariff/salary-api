@@ -104,7 +104,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ecr-scan-file
-          path: check-ecr-scan.sh
+          path: ecr-image-scan.sh
 
   ecr-scan-verify:
     runs-on: ubuntu-latest
@@ -130,7 +130,7 @@ jobs:
 
       - name: Run ECR Vulnerability Scan Check
         run: |
-          chmod +x ./check-ecr-scan.sh && ./check-ecr-scan.sh ${{ env.ECR_REPO }} ${{ needs.docker-build-push.outputs.image-tag }} ${{ env.AWS_DEFAULT_REGION }}
+          chmod +x ./ecr-image-scan.sh && ./ecr-image-scan.sh ${{ env.ECR_REPO }} ${{ needs.docker-build-push.outputs.image-tag }} ${{ env.AWS_DEFAULT_REGION }}
 
   deploy:
     runs-on: ubuntu-latest
