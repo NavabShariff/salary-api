@@ -12,9 +12,6 @@ services:
        CQL_AUTHENTICATOR_PASSWORD: password
     volumes:
       - scylla-data:/var/lib/scylla
-      # - ./init-scylla.cql:/docker-entrypoint-initdb.d/init-scylla.cql
-    # networks:
-    #   - app_network
     healthcheck:
       test: ["CMD", "cqlsh", "-u", "scylladb", "-p", "password", "-e", "desc keyspaces"]
       interval: 10s
@@ -28,8 +25,6 @@ services:
         condition: service_healthy
     volumes:
       - ./init-scylla.cql:/init-scylla.cql
-    # networks:
-    #   - app_network
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "
@@ -52,8 +47,6 @@ services:
        REDIS_PASSWORD: password
     volumes:
       - redis-data:/data
-    # networks:
-    #   - app_network
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "password", "ping"]
       interval: 10s
@@ -66,7 +59,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app  # Mount the entire project directory
-      - ./.m2:/root/.m2 # Optional: Cache Maven dependencies
+      # - ./.m2:/root/.m2 # Optional: Cache Maven dependencies
  # Optional: Persist maven dependencies across builds
     command: mvn clean test  # Runs tests using Maven
     depends_on:
@@ -74,14 +67,13 @@ services:
       - redis
     environment:
       MAVEN_OPTS: "-Xmx1024m"
+
   # salary-api:
   #   build: .
   #   # image: salary-api:1
   #   container_name: salary-api
   #   ports:
   #     - "8080:8080"
-  #   # networks:
-  #   #   - app_network
   #   depends_on:
   #     redis:
   #       condition: service_healthy
@@ -90,21 +82,6 @@ services:
   #     init-scylla:
   #       condition: service_completed_successfully
 
-
-  # salary-api:
-  #   image: salary-api:1
-  #   container_name: salary-api
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - app_network
-  #   depends_on:
-  #     - redis
-  #     - scylladb
-
-# networks:
-#   app_network:
-#     driver: bridge
 
 volumes:
   scylla-data:
