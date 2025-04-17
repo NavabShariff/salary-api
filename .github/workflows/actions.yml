@@ -140,7 +140,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: ecr-scan-verify
+    needs: docker-build-push
     steps:
 
       - name: Checkout another repository
