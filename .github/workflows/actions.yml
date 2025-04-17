@@ -40,17 +40,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Set image tags
-      #   id: vars
-      #   run: echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-
-      # Set image tag and dynamic image name
       - name: Set image name and tag
         run: |
           echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1)
-          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2)
+          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
           echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
+
 
       - name: Docker Build
         uses: NavabShariff/shared-library/.github/actions/docker-build@main
