@@ -19,6 +19,24 @@ env:
 
 jobs:
 
+  pre-setup:
+    runs-on: ubuntu-latest
+
+    outputs:
+      commit_sha: ${{ steps.vars.outputs.commit_sha }}
+      image_name: ${{ steps.vars.outputs.image_name }}
+
+    steps:
+      - name: Prepare commit sha and image name
+        id: vars
+        run: |
+          commit_sha=$(echo $GITHUB_SHA | head -c 8)
+          echo "commit_sha=$commit_sha" >> $GITHUB_OUTPUT
+          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          image_name="ghcr.io/$ORG_NAME/$REPO_NAME"
+          echo "image_name=$image_name" >> $GITHUB_OUTPUT
+
   sonar-scan:
     runs-on: ubuntu-latest
     container:
@@ -44,20 +62,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # ghcr
-      - name: Set image names 
-        if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
-        run: |
-          echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
-          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
-          echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
+      # - name: Set image names 
+      #   if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
+      #   run: |
+      #     echo "commit_sha=$commit_sha" >> $GITHUB_ENV
+      #     ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+      #     REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+      #     echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
+          
 
       - name: Docker Build
         if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
         uses: NavabShariff/shared-library/.github/actions/docker-build@main
         with:
-          image_name: ${{ env.image_name }}
-          tags: ${{ env.commit_sha }}
+          image_name: ${{ needs.pre-setup.outputs.image_name }}
+          tags: ${{ needs.pre-setup.outputs.commit_sha }}
 
       - name: Docker Login and Push
         if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
@@ -66,15 +85,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          image_name: ${{ env.image_name }}
-          tag: ${{ env.commit_sha }}
+          image_name: ${{ needs.pre-setup.outputs.image_name }}
+          tag: ${{ needs.pre-setup.outputs.commit_sha }}
 
       # aws
-      - name: Set image tags
-        if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
-        id: vars
-        run: |
-          echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
+      # - name: Set image tags
+      #   if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
+      #   id: vars
+      #   run: |
+      #     echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
+      #     echo "::set-output name=commit_sha::$commit_sha"
 
       - name: Configure AWS credentials
         if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
@@ -94,7 +114,7 @@ jobs:
         uses: NavabShariff/shared-library/.github/actions/docker-build@main
         with:
           image_name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}
-          tags: ${{ env.commit_sha }}
+          tags: ${{ needs.pre-setup.outputs.commit_sha }}
 
       - name: Docker Push (ECR)
         if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
@@ -102,7 +122,7 @@ jobs:
         with:
           skip_login: true
           image_name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}
-          tag: ${{ env.commit_sha }}
+          tag: ${{ needs.pre-setup.outputs.commit_sha }}
 
   trivy-scan:
     runs-on: ubuntu-latest
@@ -113,21 +133,31 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set image names 
-        run: |
-          echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
-          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
-          echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
+      # - name: Set image names 
+      #   run: |
+      #     echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
+      #     ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+      #     REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+      #     echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
 
       - name: Run Trivy Scan
         uses: NavabShariff/shared-library/.github/actions/docker-scan-trivy@main
         with:
-          image_name: ${{ env.image_name }}
-          tag: ${{ env.commit_sha }}
+          image_name: ${{ needs.pre-setup.outputs.image_name }}
+          tag: ${{ needs.pre-setup.outputs.commit_sha }}
           severity_threshold: 7 # You can adjust the threshold as needed
 
-      - name: Review Trivy Scan Result
-        run: |
-          # Check the Trivy result file
-          cat ${{ steps.trivy-scan.outputs.trivy_result_file }}
+      # - name: Review Trivy Scan Result
+      #   run: |
+      #     # Check the Trivy result file
+      #     cat ${{ steps.trivy-scan.outputs.trivy_result_file }}
+
+# deploy:
+#   runs-on: ubuntu-latest
+#   needs: trivy-scan
+#   steps:
+#     - name: GitOps Deploy
+#       uses: NavabShariff/shared-library/.github/actions/gitops-argocd@main
+#       with:
+#         source_of_truth_repo: NavabShariff/gitops-source
+#         image_tag: ${{ needs.pre-setup.outputs.commit_sha }}
