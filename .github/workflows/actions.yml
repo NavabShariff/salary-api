@@ -131,7 +131,7 @@ jobs:
         with:
           image_name: ${{ env.image_name }}
           tag: ${{ env.commit_sha }}
-          severity_threshold: 10 # You can adjust the threshold as needed
+          severity_threshold: 1 # You can adjust the threshold as needed
 
       - name: Review Trivy Scan Result
         run: |
