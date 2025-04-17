@@ -19,23 +19,6 @@ env:
 
 jobs:
 
-  # pre-setup:
-  #   runs-on: ubuntu-latest
-
-  #   outputs:
-  #     commit_sha: ${{ steps.vars.outputs.commit_sha }}
-  #     image_name: ${{ steps.vars.outputs.image_name }}
-
-  #   steps:
-  #     - name: Prepare commit sha and image name
-  #       id: vars
-  #       run: |
-  #         commit_sha=$(echo $GITHUB_SHA | head -c 8)
-  #         echo "commit_sha=$commit_sha" >> $GITHUB_OUTPUT
-  #         ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
-  #         REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
-  #         image_name="ghcr.io/$ORG_NAME/$REPO_NAME"
-  #         echo "image_name=$image_name" >> $GITHUB_OUTPUT
 
   sonar-scan:
     runs-on: ubuntu-latest
