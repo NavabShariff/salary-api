@@ -59,14 +59,12 @@ jobs:
 
   docker-build-push:
     runs-on: ubuntu-latest
-       
-    outputs:
-      image-tag: ${{ steps.vars.outputs.image_tag }}
-      image-name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}
-
     needs: 
     - clone
     - sonar-scan
+    outputs:
+      image-tag: ${{ steps.vars.outputs.image_tag }}
+      image-name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}
     steps:
       - name: Download source code
         uses: actions/download-artifact@v4
@@ -127,18 +125,12 @@ jobs:
           role-session-name: GitHubActionSession
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-
-      - name: Set Image Tags
-        id: vars
-        run: |
-          echo "IMAGE_TAG=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-
       - name: Install JQ
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Run ECR Vulnerability Scan Check
         run: |
-          chmod +x ./check-ecr-scan.sh && ./check-ecr-scan.sh ${{ env.ECR_REPO }} ${{ env.IMAGE_TAG }} ${{ env.AWS_DEFAULT_REGION }}
+          chmod +x ./check-ecr-scan.sh && ./check-ecr-scan.sh ${{ env.ECR_REPO }} ${{ needs.docker-build-push.outputs.image-tag }} ${{ env.AWS_DEFAULT_REGION }}
 
   deploy:
     runs-on: ubuntu-latest
