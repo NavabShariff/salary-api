@@ -112,7 +112,7 @@ jobs:
 
   trivy-scan:
     runs-on: ubuntu-latest
-    if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
+    if: ${{ vars.DOCKER_REGISTRY == 'ghcr' }}
     needs:  docker-build-and-push 
 
     steps:
