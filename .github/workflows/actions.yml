@@ -33,7 +33,7 @@ jobs:
   #         coverageReportPath: ${{ env.coverage_report_path }}
   #         qualityGateWait: ${{ env.qualityGateWait }}
 
-  build-and-push:
+  docker-build-and-push:
     runs-on: ubuntu-latest
     # needs: sonar-scan
 
