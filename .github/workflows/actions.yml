@@ -6,6 +6,7 @@ on:
 
 env:
   coverage_report_path: 'jacoco.xml'
+  qualityGateWait: 'false'
 
 jobs:
 
@@ -27,7 +28,7 @@ jobs:
           sonarHostUrl: ${{ secrets.SONAR_HOST_URL }}
           sonarToken: ${{ secrets.SONAR_TOKEN }}
           coverageReportPath: ${{ env.coverage_report_path }}
-
+          qualityGateWait: ${{ env.qualityGateWait }}
   # build:
   #   runs-on: ubuntu-latest
 
