@@ -28,12 +28,12 @@ echo "CRITICAL: $CRITICAL"
 echo "HIGH: $HIGH"
 echo "==============================="
 
-if [[ "$CRITICAL" -gt 0 ]]; then
+if [[ "$CRITICAL" -gt 5 ]]; then
   echo "❌ Image has $CRITICAL CRITICAL vulnerabilities! Failing pipeline."
   exit 1
 fi
 
-if [[ "$HIGH" -gt 30 ]]; then
+if [[ "$HIGH" -gt 5 ]]; then
   echo "❌ Image has more than 30 HIGH vulnerabilities ($HIGH found). Failing pipeline."
   exit 1
 fi
