@@ -147,7 +147,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: NavabShariff/gitops-source 
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
 
       # - name: Set Image Tags
       #   id: vars
