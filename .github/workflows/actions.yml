@@ -48,29 +48,29 @@ jobs:
       - uses: actions/checkout@v4
 
   
-      # - name: Set image name and tag
-      #   run: |
-      #     echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
-      #     ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
-      #     REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
-      #     echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
+      - name: Set image name and tag
+        run: |
+          echo "commit_sha=$(echo $GITHUB_SHA | head -c 8)" >> $GITHUB_ENV
+          ORG_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          echo "image_name=ghcr.io/$ORG_NAME/$REPO_NAME" >> $GITHUB_ENV
 
 
-      # - name: Docker Build
-      #   uses: NavabShariff/shared-library/.github/actions/docker-build@main
-      #   with:
-      #     image_name: ${{ env.image_name }}
-      #     tags: ${{ env.commit_sha }}
+      - name: Docker Build
+        uses: NavabShariff/shared-library/.github/actions/docker-build@main
+        with:
+          image_name: ${{ env.image_name }}
+          tags: ${{ env.commit_sha }}
 
-      # - name: Docker Login and Push
-      #   if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
-      #   uses: NavabShariff/shared-library/.github/actions/docker-login-push@main
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-      #     image_name: ${{ env.image_name }}
-      #     tag: ${{ env.commit_sha }}
+      - name: Docker Login and Push
+        if: ${{ env.DOCKER_REGISTRY == 'ghcr' }}
+        uses: NavabShariff/shared-library/.github/actions/docker-login-push@main
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          image_name: ${{ env.image_name }}
+          tag: ${{ env.commit_sha }}
 
       # aws
       - name: Configure AWS credentials
@@ -86,10 +86,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      # - name: Docker Login and Push (ECR)
-      #   if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
-      #   uses: NavabShariff/shared-library/.github/actions/docker-login-push@main
-      #   with:
-      #     skip_login: true
-      #     image_name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}
-      #     tag: ${{ env.commit_sha }}
+      - name: Docker Login and Push (ECR)
+        if: ${{ env.DOCKER_REGISTRY == 'ecr' }}
+        uses: NavabShariff/shared-library/.github/actions/docker-login-push@main
+        with:
+          skip_login: true
+          image_name: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}
+          tag: ${{ env.commit_sha }}
