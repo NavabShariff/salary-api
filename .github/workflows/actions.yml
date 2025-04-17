@@ -14,7 +14,7 @@ env:
   qualityGateWait: 'false'
   language: 'java'
   AWS_REGION: 'ap-south-1'
-  DOCKER_REGISTRY: 'ghcr'
+  DOCKER_REGISTRY: ghcr
   ECR_REPO_NAME: navab
 
 jobs:
