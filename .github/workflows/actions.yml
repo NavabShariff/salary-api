@@ -12,30 +12,11 @@ permissions:
 jobs:
    
   build:
-   runs-on: ubuntu-latest
-   steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          path: .
-          
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Execute Maven
-        run: mvn clean compile -DskipTests
-
-      - name: Upload Source Code
-        uses: actions/upload-artifact@v4
-        with:
-          name: source-code
-          path: .
-
-
-
+    uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
+    with:
+      java_version: '17'
+      mvn_command: clean compile -DskipTests
+      
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
