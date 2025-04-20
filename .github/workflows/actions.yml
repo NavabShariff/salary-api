@@ -12,23 +12,13 @@ permissions:
 jobs:
 
   build:
-   runs-on: ubuntu-latest
-   steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    
-    - name: Build source code using maven
-      uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
-      with:
-        java_version: '17'
-        mvn_command: clean compile -DskipTests
-
-    - name: Upload Source Code
-      uses: actions/upload-artifact@v4
-      with:
-        name: source-code
-        path: .
-        
+    uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
+    with:
+      java_version: '17'
+      mvn_command: clean compile -DskipTests
+      upload_artifact: true
+      artifact_name: ${{ github.event.repository.name }}
+      
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
