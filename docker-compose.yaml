@@ -59,14 +59,25 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app  # Mount the entire project directory
-      # - ./.m2:/root/.m2 # Optional: Cache Maven dependencies
- # Optional: Persist maven dependencies across builds
-    command: mvn clean test  # Runs tests using Maven
+    command: mvn clean package
     depends_on:
       - scylladb
       - redis
     environment:
       MAVEN_OPTS: "-Xmx1024m"
+
+  # sonarscanner:
+  #   image: sonarsource/sonar-scanner-cli:latest
+  #   container_name: sonarscanner
+  #   working_dir: /usr/src/app
+  #   depends_on:
+  #    - maven
+  #   volumes:
+  #     - .:/usr/src/app
+  #   command: >
+  #     /bin/sh -c "
+  #     sonar-scanner
+  #     "
 
   # salary-api:
   #   build: .
