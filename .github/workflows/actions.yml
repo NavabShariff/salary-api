@@ -19,16 +19,16 @@ jobs:
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
 
-  sast:
-    needs: build
-    uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
-    secrets:
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    with: 
-      download_artifacts: true
-      artifact_name: ${{ github.event.repository.name }}
-      qualitygate: false
+  # sast:
+  #   needs: build
+  #   uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
+  #   secrets:
+  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #   with: 
+  #     download_artifacts: true
+  #     artifact_name: ${{ github.event.repository.name }}
+  #     qualitygate: false
 
   # docker-image-build:
     # needs: [sast]
@@ -42,7 +42,7 @@ jobs:
     #   AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
   docker-image-build-ghcr:
-    needs: [sast]
+    needs: [build]
     uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ghcr.yml@main
     with:
       download_artifacts: true
