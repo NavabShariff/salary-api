@@ -20,6 +20,7 @@ jobs:
       artifact_name: ${{ github.event.repository.name }}
 
   sast:
+    needs: build
     uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
     secrets:
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -27,7 +28,7 @@ jobs:
     with: 
       download_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
-      
+      qualitygate: true
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
