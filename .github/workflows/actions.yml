@@ -55,6 +55,7 @@ jobs:
 
 
   trigger-cd:
+    needs: [docker-image-scan]
     uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
     with:
       gitops_repo: "NavabShariff/gitops-source"
