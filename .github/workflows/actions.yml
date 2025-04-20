@@ -52,7 +52,41 @@ jobs:
       artifact_name: ${{ github.event.repository.name }}
     secrets:
       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-      
+
+
+  trigger-cd:
+    uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
+    with:
+      gitops_repo: "NavabShariff/gitops-source"
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  notify-on-success:
+    uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
+    needs: [build, sast, docker-image-build, docker-image-scan]
+    if: success()
+    with:
+      status: success
+      commit_author_name: ${{ github.event.pusher.name }}
+      commit_message: ${{ github.event.head_commit.message }}
+      commit_id: ${{ github.sha }}
+      run_id: ${{ github.run_id }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  notify-on-failure:
+    uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
+    needs: [build, sast, docker-image-build, docker-image-scan, Trigger-CD]
+    if: failure()
+    with:
+      status: failure
+      commit_author_name: ${{ github.event.pusher.name }}
+      commit_message: ${{ github.event.head_commit.message }}
+      commit_id: ${{ github.sha }}
+      run_id: ${{ github.run_id }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   # docker-image-build-ghcr:
   #   needs: [build]
   #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ghcr.yml@main
