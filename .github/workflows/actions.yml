@@ -16,9 +16,9 @@ jobs:
     with:
       java_version: '17'
       mvn_command: clean compile -DskipTests
-      upload_artifact: true
+      upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
-      
+
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
