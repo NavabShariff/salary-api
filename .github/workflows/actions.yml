@@ -19,34 +19,48 @@ jobs:
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
 
-  # sast:
-  #   needs: build
-  #   uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
-  #   secrets:
-  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #   with: 
-  #     download_artifacts: true
-  #     artifact_name: ${{ github.event.repository.name }}
-  #     qualitygate: false
-
-  # docker-image-build:
-    # needs: [sast]
-    # uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
-    # with:
-    #   ecr_repo: 'salary-api'
-    #   aws_region: 'ap-south-1'
-    #   download_artifacts: true
-    #   artifact_name: ${{ github.event.repository.name }}
-    # secrets:
-    #   AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-
-  docker-image-build-ghcr:
-    needs: [build]
-    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ghcr.yml@main
-    with:
+  sast:
+    needs: build
+    uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
+    secrets:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    with: 
       download_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
+      qualitygate: false
+
+  docker-image-build:
+    needs: [sast]
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      artifact_name: ${{ github.event.repository.name }}
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+
+
+  docker-image-scan:
+    needs: [docker-image-build]
+    uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      artifact_name: ${{ github.event.repository.name }}
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+      
+  # docker-image-build-ghcr:
+  #   needs: [build]
+  #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ghcr.yml@main
+  #   with:
+  #     download_artifacts: true
+  #     artifact_name: ${{ github.event.repository.name }}
+
+
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
