@@ -30,18 +30,23 @@ jobs:
       artifact_name: ${{ github.event.repository.name }}
       qualitygate: false
 
-  docker-image-build:
+  # docker-image-build:
+    # needs: [sast]
+    # uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    # with:
+    #   ecr_repo: 'salary-api'
+    #   aws_region: 'ap-south-1'
+    #   download_artifacts: true
+    #   artifact_name: ${{ github.event.repository.name }}
+    # secrets:
+    #   AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+
+  docker-image-build-ghcr:
     needs: [sast]
-    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ghcr.yml@main
     with:
-      ecr_repo: 'salary-api'
-      aws_region: 'ap-south-1'
       download_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
-    secrets:
-      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-
-
   # clone:
   #   runs-on: ubuntu-latest
   #   steps:
