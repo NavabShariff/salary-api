@@ -76,29 +76,3 @@ jobs:
       run_id: ${{ github.run_id }}
     secrets:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  # notify-on-success:
-  #   uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
-  #   needs: [build, sast, docker-image-build, docker-image-scan]
-  #   if: success()
-  #   with:
-  #     status: success
-  #     commit_author_name: ${{ github.event.pusher.name }}
-  #     commit_message: ${{ github.event.head_commit.message }}
-  #     commit_id: ${{ github.sha }}
-  #     run_id: ${{ github.run_id }}
-  #   secrets:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  # notify-on-failure:
-  #   uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
-  #   needs: [build, sast, docker-image-build, docker-image-scan, Trigger-CD]
-  #   if: failure()
-  #   with:
-  #     status: failure
-  #     commit_author_name: ${{ github.event.pusher.name }}
-  #     commit_message: ${{ github.event.head_commit.message }}
-  #     commit_id: ${{ github.sha }}
-  #     run_id: ${{ github.run_id }}
-  #   secrets:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
