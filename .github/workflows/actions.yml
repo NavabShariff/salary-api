@@ -35,7 +35,7 @@ jobs:
       upload_artifacts: true
       upload_artifact_name: ${{ github.event.repository.name }}-compile-code
 
-  bug-analysis:
+  bug_analysis:
     needs: build
     uses: NavabShariff/shared-library/.github/workflows/bug-analysis.yml@main
     with: 
@@ -45,6 +45,15 @@ jobs:
       mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
       bug_report_name: ${{ github.event.repository.name }}-bug-report
 
+  dependency_check:
+    needs: pre_checks
+    uses: NavabShariff/shared-library/.github/workflows/dependency-check.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      java_version: '17'
+      mvn_command: dependency-check:check
+      bug_report_name: ${{ github.event.repository.name }}-dependency-check-report
 
   # sast:
   #   needs: build
