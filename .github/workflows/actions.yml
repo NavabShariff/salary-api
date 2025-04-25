@@ -70,28 +70,28 @@ jobs:
       dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
       qualitygate: false
 
-  # docker-image-build:
-  #   needs: [sast]
-  #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifacts: true
-  #     artifact_name: ${{ github.event.repository.name }}
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker-image-build:
+    needs: [sca]
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
 
-  # docker-image-scan:
-  #   needs: [docker-image-build]
-  #   uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifacts: true
-  #     artifact_name: ${{ github.event.repository.name }}
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker-image-scan:
+    needs: [docker-image-build]
+    uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
 
   # trigger-cd:
