@@ -12,8 +12,8 @@ pattern = "**/.env"
 # Allowlist for files to exclude from scanning
 [allowlist]
 paths = [
-  "**/.env",
-  "**/Dockerfile"
+  "\\.env$",
+  "Dockerfile$"
 ]
 
 # Scan all files
