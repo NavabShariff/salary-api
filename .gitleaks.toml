@@ -1,0 +1,29 @@
+# .gitleaks.toml
+
+# Define the rules to scan for
+[[rules]]
+description = "Generic API Key"
+regex = '''(api|secret|key|token)[\s]*=[\s]*['"][^'"]{32,}['"]'''
+tags = ["apikey", "generic"]
+severity = "HIGH"
+
+# Include .env file in scan
+[[files]]
+pattern = "**/.env"
+
+# Enable custom scanning for different file types
+[[allowlist]]
+files = [".env", "Dockerfile"]
+
+# Scan all files
+[[scan]]
+# This includes all files, even those not tracked in git
+include = [
+  "**/*.js", 
+  "**/*.ts", 
+  "**/.env", 
+  "**/*.yaml", 
+  "**/*.yml"
+]
+
+verbose = true
