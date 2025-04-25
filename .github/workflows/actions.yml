@@ -19,7 +19,7 @@ jobs:
       commit_message: 'false'
       license_scanning: true
       license_decision_file: 'dependency_decisions.yml'
-      upload_artifacts: false
+      upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
       GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
 
