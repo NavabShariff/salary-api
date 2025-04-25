@@ -1,10 +1,17 @@
 # Define the rules to scan for
 [[rules]]
-id = "generic-api-key"  # Added unique ID for the rule
+id = "generic-api-key"
 description = "Generic API Key"
 regex = '''(api|secret|key|token)[\s]*=[\s]*['"][^'"]{32,}['"]'''
 tags = ["apikey", "generic"]
 severity = "HIGH"
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Secret Access Key"
+regex = '''AWS_SECRET_ACCESS_KEY[\s]*=[\s]*(?:['"])?[A-Za-z0-9+/]{20,}(?:['"])?'''
+tags = ["aws", "secret"]
+severity = "CRITICAL"
 
 # Include .env file in scan
 [[files]]
