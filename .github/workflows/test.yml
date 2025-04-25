@@ -1,0 +1,17 @@
+name: test
+
+on: 
+ push:
+  branches: ['main']
+
+jobs:
+  test-one:
+    uses: NavabShariff/shared-library/.github/workflows/test-one.yml@main
+    with:
+      image_name: 'Navab Shariff'
+   
+  test-one:
+    needs: test-one
+    uses: NavabShariff/shared-library/.github/workflows/test-two.yml@main
+    with:
+      image_name: ${{ needs.test-one.outputs.image_name }}
