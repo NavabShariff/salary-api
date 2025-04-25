@@ -65,7 +65,7 @@ jobs:
       download_artifact_name: ${{ github.event.repository.name }}-compile-code
       download_bug_report: true
       bug_report_name: ${{ github.event.repository.name }}-bug-report
-      download_dependency_check_report: true
+      download_dependency_check_report: false
       dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
       qualitygate: false
 
