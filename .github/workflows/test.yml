@@ -14,4 +14,4 @@ jobs:
     needs: test-one
     uses: NavabShariff/shared-library/.github/workflows/test-two.yml@main
     with:
-      image_name: ${{ needs.test-one.outputs.image_name }}
+      image_name: ${{ needs.test-one.outputs.name }}
