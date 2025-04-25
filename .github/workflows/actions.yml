@@ -17,7 +17,7 @@ jobs:
    with:
       commit_sign_off: 'true'
       commit_message: 'false'
-      license_scanning: false
+      license_scanning: true
       license_decision_file: 'dependency_decisions.yml'
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
@@ -44,18 +44,18 @@ jobs:
       mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
       bug_report_name: ${{ github.event.repository.name }}-bug-report
 
-  # dependency_check:
-  #   needs: pre_checks
-  #   uses: NavabShariff/shared-library/.github/workflows/dependency-check.yml@main
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     java_version: '17'
-  #     mvn_command: dependency-check:check
-  #     dependency_report_name: ${{ github.event.repository.name }}-dependency-check-report
+  dependency_check:
+    needs: pre_checks
+    uses: NavabShariff/shared-library/.github/workflows/dependency-check.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      java_version: '17'
+      mvn_command: dependency-check:check
+      dependency_report_name: ${{ github.event.repository.name }}-dependency-check-report
 
   sca:
-    needs: [build, bug_analysis]
+    needs: [build, bug_analysis, dependency_check]
     uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
     secrets:
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -104,23 +104,23 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # trigger-cd:
-  #   needs: [docker-image-scan]
-  #   uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
-  #   with:
-  #     gitops_repo: "NavabShariff/gitops-source"
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  trigger_cd:
+    needs: [dast]
+    uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
+    with:
+      gitops_repo: "NavabShariff/gitops-source"
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # notify:
-  #   uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
-  #   needs: [build, sast, docker_build_push, docker-image-scan, trigger-cd]
-  #   if: always()
-  #   with:
-  #     status: ${{ contains(join(needs.*.result, ' '), 'failure') && 'failure' || 'success' }}
-  #     commit_author_name: ${{ github.event.pusher.name }}
-  #     commit_message: ${{ github.event.head_commit.message }}
-  #     commit_id: ${{ github.sha }}
-  #     run_id: ${{ github.run_id }}
-  #   secrets:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  slack_notification:
+    uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
+    needs: [pre_checks, build, bug_analysis, dependency_check, sca, docker_build_push, docker_image_scan, dast, trigger_cd]
+    if: always()
+    with:
+      status: ${{ contains(join(needs.*.result, ' '), 'failure') && 'failure' || 'success' }}
+      commit_author_name: ${{ github.event.pusher.name }}
+      commit_message: ${{ github.event.head_commit.message }}
+      commit_id: ${{ github.sha }}
+      run_id: ${{ github.run_id }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
