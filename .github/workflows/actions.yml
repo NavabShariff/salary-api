@@ -1,26 +1,26 @@
-# name: Salary API CI pipeline
+name: Salary API CI pipeline
 
-# on:
-#   push:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
 
 
-# permissions:
-#     id-token: write
-#     contents: read  
-#     packages: write
+permissions:
+    id-token: write
+    contents: read  
+    packages: write
     
-# jobs:
+jobs:
 
-#   pre_checks:
-#    uses: NavabShariff/shared-library/.github/workflows/pre-checks.yml@main
-#    with:
-#       commit_sign_off: 'true'
-#       commit_message: 'false'
-#       license_scanning: false
-#       license_decision_file: 'dependency_decisions.yml'
-#       upload_artifacts: true
-#       artifact_name: ${{ github.event.repository.name }}
+  pre_checks:
+   uses: NavabShariff/shared-library/.github/workflows/pre-checks.yml@main
+   with:
+      commit_sign_off: 'true'
+      commit_message: 'false'
+      license_scanning: false
+      license_decision_file: 'dependency_decisions.yml'
+      upload_artifacts: true
+      artifact_name: ${{ github.event.repository.name }}
 
   # build:
   #   needs: pre_checks
@@ -69,17 +69,17 @@
   #     dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
   #     qualitygate: false
 
-  # docker-image-build:
-  #   needs: [pre_checks]
-  #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     save_docker_image: true
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker-image-build:
+    needs: [pre_checks]
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      save_docker_image: true
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
 
   # docker-image-scan:
@@ -93,14 +93,14 @@
   #   secrets:
   #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
-  # dast:
-  #   needs: [docker-image-build]
-  #   uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     image_name: ${{ needs.docker-image-build.outputs.image_name }}
-  #     image_tag: ${{ needs.docker-image-build.outputs.image_tag }}
+  dast:
+    needs: [docker-image-build]
+    uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      image_name: ${{ needs.docker-image-build.outputs.image_name }}
+      image_tag: ${{ needs.docker-image-build.outputs.image_tag }}
 
   # trigger-cd:
   #   needs: [docker-image-scan]
