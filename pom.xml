@@ -117,6 +117,7 @@
 			<plugin>
 			<groupId>org.owasp</groupId>
 			<artifactId>dependency-check-maven</artifactId>
+			<version>8.4.0</version> <!-- (or latest stable) -->
 			<executions>
 				<execution>
 				<phase>verify</phase>
@@ -127,10 +128,33 @@
 			</executions>
 			<configuration>
 				<nvdApiKey>7f77532c-ff0b-4972-a1d1-f6ed6f2bda7d</nvdApiKey>
+				<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+				<!-- <failBuildOnCVSS>7.0</failBuildOnCVSS> -->
+				<!-- Output all 3 formats -->
 				<formats>
-				<format>XML</format>
+				<format>HTML</format>
 				</formats>
+
+				<!-- Output directory (Sonar expects this path) -->
+				<outputDirectory>${project.basedir}</outputDirectory>
 			</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.7.3.0</version>
+				<configuration>
+					<effort>Max</effort>
+					<failOnError>false</failOnError>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.10.0.2594</version>
 			</plugin>
 		</plugins>
 	</build>
