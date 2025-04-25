@@ -17,7 +17,7 @@ jobs:
    with:
       commit_sign_off: 'true'
       commit_message: 'false'
-      license_scanning: true
+      license_scanning: false
       license_decision_file: 'dependency_decisions.yml'
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
