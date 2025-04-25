@@ -55,16 +55,20 @@ jobs:
       mvn_command: dependency-check:check
       dependency_report_name: ${{ github.event.repository.name }}-dependency-check-report
 
-  # sast:
-  #   needs: build
-  #   uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
-  #   secrets:
-  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #   with: 
-  #     download_artifacts: true
-  #     artifact_name: ${{ github.event.repository.name }}
-  #     qualitygate: false
+  sca:
+    needs: [build, bug_analysis, dependency_check]
+    uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
+    secrets:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    with: 
+      download_artifacts: true
+      artifact_name: ${{ github.event.repository.name }}-compile-code
+      download_bug_report: true
+      bug_report_name: ${{ github.event.repository.name }}-bug-report
+      download_dependency_check_report: true
+      dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
+      qualitygate: false
 
   # docker-image-build:
   #   needs: [sast]
