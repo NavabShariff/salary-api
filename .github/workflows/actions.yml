@@ -15,13 +15,13 @@ jobs:
   pre_checks:
    uses: NavabShariff/shared-library/.github/workflows/pre-checks.yml@main
    with:
-     commit_sign_off: 'true'
-     commit_message: 'false'
-     license_scanning: true
-     license_decision_file: 'dependency_decisions.yml'
-     upload_artifacts: false
-     artifact_name: ${{ github.event.repository.name }}
-
+      commit_sign_off: 'true'
+      commit_message: 'false'
+      license_scanning: true
+      license_decision_file: 'dependency_decisions.yml'
+      upload_artifacts: false
+      artifact_name: ${{ github.event.repository.name }}
+      GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
 
   build:
     needs: pre_checks
