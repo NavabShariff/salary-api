@@ -10,7 +10,7 @@ jobs:
     with:
       image_name: 'Navab Shariff'
    
-  test-one:
+  test-two:
     needs: test-one
     uses: NavabShariff/shared-library/.github/workflows/test-two.yml@main
     with:
