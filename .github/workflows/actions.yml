@@ -81,6 +81,7 @@ jobs:
     secrets:
       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
+
   # docker-image-scan:
   #   needs: [docker-image-build]
   #   uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
