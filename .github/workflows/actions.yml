@@ -21,7 +21,7 @@ jobs:
       license_decision_file: 'dependency_decisions.yml'
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
-      GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+      # GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
 
   build:
     needs: pre_checks
