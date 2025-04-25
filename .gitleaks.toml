@@ -1,5 +1,6 @@
 # Define the rules to scan for
 [[rules]]
+id = "generic-api-key"  # Added unique ID for the rule
 description = "Generic API Key"
 regex = '''(api|secret|key|token)[\s]*=[\s]*['"][^'"]{32,}['"]'''
 tags = ["apikey", "generic"]
