@@ -22,27 +22,27 @@ jobs:
       upload_artifacts: true
       artifact_name: ${{ github.event.repository.name }}
 
-  # build:
-  #   needs: pre_checks
-  #   uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
-  #   with:
-  #     checkout: false
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     java_version: '17'
-  #     mvn_command: clean compile -DskipTests
-  #     upload_artifacts: true
-  #     upload_artifact_name: ${{ github.event.repository.name }}-compile-code
+  build:
+    needs: pre_checks
+    uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
+    with:
+      checkout: false
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      java_version: '17'
+      mvn_command: clean compile -DskipTests
+      upload_artifacts: true
+      upload_artifact_name: ${{ github.event.repository.name }}-compile-code
 
-  # bug_analysis:
-  #   needs: build
-  #   uses: NavabShariff/shared-library/.github/workflows/bug-analysis.yml@main
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}-compile-code
-  #     java_version: '17'
-  #     mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
-  #     bug_report_name: ${{ github.event.repository.name }}-bug-report
+  bug_analysis:
+    needs: build
+    uses: NavabShariff/shared-library/.github/workflows/bug-analysis.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}-compile-code
+      java_version: '17'
+      mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
+      bug_report_name: ${{ github.event.repository.name }}-bug-report
 
   # dependency_check:
   #   needs: pre_checks
@@ -54,23 +54,23 @@ jobs:
   #     mvn_command: dependency-check:check
   #     dependency_report_name: ${{ github.event.repository.name }}-dependency-check-report
 
-  # sca:
-  #   needs: [build, bug_analysis, dependency_check]
-  #   uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
-  #   secrets:
-  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}-compile-code
-  #     download_bug_report: true
-  #     bug_report_name: ${{ github.event.repository.name }}-bug-report
-  #     download_dependency_check_report: true
-  #     dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
-  #     qualitygate: false
+  sca:
+    needs: [build, bug_analysis]
+    uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
+    secrets:
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}-compile-code
+      download_bug_report: true
+      bug_report_name: ${{ github.event.repository.name }}-bug-report
+      download_dependency_check_report: true
+      dependency_check_report_name: ${{ github.event.repository.name }}-dependency-check-report
+      qualitygate: false
 
-  docker-image-build:
-    needs: [pre_checks]
+  docker_build_push:
+    needs: [sca]
     uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
     with:
       ecr_repo: 'salary-api'
@@ -82,25 +82,27 @@ jobs:
       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
 
-  # docker-image-scan:
-  #   needs: [docker-image-build]
-  #   uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker_image_scan:
+    needs: [docker_build_push]
+    uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
   dast:
-    needs: [docker-image-build]
+    needs: [docker_build_push, docker_image_scan]
     uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
     with: 
       download_artifacts: true
       download_artifact_name: ${{ github.event.repository.name }}
-      image_name: ${{ needs.docker-image-build.outputs.image_name }}
-      image_tag: ${{ needs.docker-image-build.outputs.image_tag }}
+      image_name: ${{ needs.docker_build_push.outputs.image_name }}
+      image_tag: ${{ needs.docker_build_push.outputs.image_tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   # trigger-cd:
   #   needs: [docker-image-scan]
@@ -112,7 +114,7 @@ jobs:
 
   # notify:
   #   uses: NavabShariff/shared-library/.github/workflows/send-slack-alert.yml@main
-  #   needs: [build, sast, docker-image-build, docker-image-scan, trigger-cd]
+  #   needs: [build, sast, docker_build_push, docker-image-scan, trigger-cd]
   #   if: always()
   #   with:
   #     status: ${{ contains(join(needs.*.result, ' '), 'failure') && 'failure' || 'success' }}
