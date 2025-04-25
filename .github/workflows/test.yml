@@ -16,7 +16,8 @@ jobs:
     outputs:
       image_name: ${{ needs.test-one.outputs.name }}
     steps:
-      - run: echo "Output from test-one: ${{ needs.test-one.outputs.name }}"
+      - run: |
+          echo "Output from test-one: ${{ needs.test-one.outputs.name }}"
 
   test-two:
     needs: test-one
