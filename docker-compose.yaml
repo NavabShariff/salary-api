@@ -53,45 +53,34 @@ services:
       timeout: 5s
       retries: 5
 
-  maven:
-    image: maven:3.8-openjdk-17
-    container_name: maven
-    working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app  # Mount the entire project directory
-    command: mvn clean package
+#   maven:
+#     image: maven:3.8-openjdk-17
+#     container_name: maven
+#     working_dir: /usr/src/app
+#     volumes:
+#       - .:/usr/src/app  # Mount the entire project directory
+#       # - ./.m2:/root/.m2 # Optional: Cache Maven dependencies
+#  # Optional: Persist maven dependencies across builds
+#     command: mvn clean package -DskipTests # Runs tests using Maven
+#     depends_on:
+#       - scylladb
+#       - redis
+#     environment:
+#       MAVEN_OPTS: "-Xmx1024m"
+
+  salary-api:
+    # build: .
+    image: $IMAGE_NAME
+    container_name: salary-api
+    ports:
+      - "8080:8080"
     depends_on:
-      - scylladb
-      - redis
-    environment:
-      MAVEN_OPTS: "-Xmx1024m"
-
-  # sonarscanner:
-  #   image: sonarsource/sonar-scanner-cli:latest
-  #   container_name: sonarscanner
-  #   working_dir: /usr/src/app
-  #   depends_on:
-  #    - maven
-  #   volumes:
-  #     - .:/usr/src/app
-  #   command: >
-  #     /bin/sh -c "
-  #     sonar-scanner
-  #     "
-
-  # salary-api:
-  #   build: .
-  #   # image: salary-api:1
-  #   container_name: salary-api
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #     scylladb:
-  #       condition: service_healthy
-  #     init-scylla:
-  #       condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      scylladb:
+        condition: service_healthy
+      init-scylla:
+        condition: service_completed_successfully
 
 
 volumes:

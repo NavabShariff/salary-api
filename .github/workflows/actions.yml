@@ -78,9 +78,9 @@ jobs:
       aws_region: 'ap-south-1'
       download_artifacts: true
       download_artifact_name: ${{ github.event.repository.name }}
+      save_docker_image: true
     secrets:
       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-
 
   docker-image-scan:
     needs: [docker-image-build]
@@ -92,6 +92,13 @@ jobs:
       download_artifact_name: ${{ github.event.repository.name }}
     secrets:
       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+
+  dast:
+    needs: [docker-image-build, docker-image-scan]  
+    uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
 
 
   # trigger-cd:
