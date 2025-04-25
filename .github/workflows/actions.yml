@@ -27,13 +27,24 @@ jobs:
     needs: pre_checks
     uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
     with:
-      checkout: true
-      download_artifacts: false
-      artifact_name: ${{ github.event.repository.name }}
+      checkout: false
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
       java_version: '17'
       mvn_command: clean compile -DskipTests
       upload_artifacts: true
       upload_artifact_name: ${{ github.event.repository.name }}-compile-code
+
+  bug-analysis:
+    needs: build
+    uses: NavabShariff/shared-library/.github/workflows/bug-analysis.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}-compile-code
+      java_version: '17'
+      mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
+      bug_report_name: ${{ github.event.repository.name }}-bug-report
+
 
   # sast:
   #   needs: build
