@@ -20,7 +20,7 @@ jobs:
      redact: 'true'
      commit_sign_off: 'true'
      commit_message: 'false'
-     upload_artifacts: 'true'
+     upload_artifacts: true
      artifact_name: 'source-code'
 
 
