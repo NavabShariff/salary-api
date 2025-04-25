@@ -15,9 +15,6 @@ jobs:
   pre_checks:
    uses: NavabShariff/shared-library/.github/workflows/pre-checks.yml@main
    with:
-    #  fail: 'true'
-    #  verbose: 'true'
-    #  redact: 'true'
      commit_sign_off: 'true'
      commit_message: 'false'
      upload_artifacts: true
