@@ -20,18 +20,20 @@ jobs:
      license_scanning: true
      license_decision_file: 'dependency_decisions.yml'
      upload_artifacts: true
-     artifact_name: 'source-code'
+     artifact_name: ${{ github.event.repository.name }}
 
 
-
-
-  # build:
-  #   uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
-  #   with:
-  #     java_version: '17'
-  #     mvn_command: clean compile -DskipTests
-  #     upload_artifacts: true
-  #     artifact_name: ${{ github.event.repository.name }}
+  build:
+    needs: pre_checks
+    uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
+    with:
+      checkout: false
+      download_artifacts: true
+      artifact_name: ${{ github.event.repository.name }}
+      java_version: '17'
+      mvn_command: clean compile -DskipTests
+      upload_artifacts: true
+      upload_artifact_name: ${{ github.event.repository.name }}-compile-code
 
   # sast:
   #   needs: build
