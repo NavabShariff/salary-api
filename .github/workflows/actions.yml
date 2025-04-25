@@ -98,7 +98,8 @@ jobs:
     with: 
       download_artifacts: true
       download_artifact_name: ${{ github.event.repository.name }}
-
+      image_name: ${{ needs.docker-image-build.outputs.image_name }}
+      image_tag: ${{ needs.docker-image-build.outputs.image_tag }}
 
   # trigger-cd:
   #   needs: [docker-image-scan]
