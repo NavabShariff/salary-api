@@ -18,6 +18,7 @@ jobs:
        exit 1
 
   success:
+    needs: [test]
     if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
@@ -57,6 +58,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   failure:
+    needs: [test]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     steps:
