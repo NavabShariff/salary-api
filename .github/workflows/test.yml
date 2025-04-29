@@ -15,7 +15,7 @@ jobs:
 
     - name: build
       run: |
-       echo "Successfull"
+       exit 1
 
   success:
     needs: [test]
@@ -87,7 +87,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Branch:* `${{ github.ref_name }}`\n*Commit ID:* `${{ github.sha }}`"
+                    "text": "*Branch:* `${{ github.ref_name }}`\n*Commit ID:* `${{ github.sha }}`\n*Message:* _${{ github.event.head_commit.message }}_"
                   }
                 },
                 {
