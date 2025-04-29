@@ -15,7 +15,7 @@ jobs:
 
     - name: build
       run: |
-       echo "Success"
+       exit 1
 
   success:
     if: ${{ success() }}
