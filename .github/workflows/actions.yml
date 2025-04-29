@@ -87,8 +87,7 @@
 #     with:
 #       ecr_repo: 'salary-api'
 #       aws_region: 'ap-south-1'
-#       download_artifacts: true
-#       download_artifact_name: ${{ github.event.repository.name }}
+#       critical_threshold: 5
 #     secrets:
 #       AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
