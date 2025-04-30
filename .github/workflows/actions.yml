@@ -138,10 +138,10 @@ jobs:
       uses: NavabShariff/shared-library/.github/actions/sonarqube-scan@main
       with:
         qualitygate: 'true'
-      secrets:
+      env:
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        
+
   # sca:
   #   needs: [build, bug_analysis, dependency_check]
   #   uses: NavabShariff/shared-library/.github/workflows/sonar-scanning-java.yml@main
