@@ -78,30 +78,30 @@ jobs:
         name: ${{ github.event.repository.name }}-bugreport
         path: target/*.xml
 
-  # dependency_check:
-  #   needs: [pre_checks]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Download Source code
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}
-  #      path: .
+  dependency_check:
+    needs: [pre_checks]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}
+       path: .
 
-  #   - name: run dependency check
-  #     uses: NavabShariff/shared-library/.github/actions/java-maven@main
-  #     with:
-  #       java_version: '17'
-  #       mvn_command: dependency-check:check
+    - name: run dependency check
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
+      with:
+        java_version: '17'
+        mvn_command: dependency-check:check
 
-  #   - name: Upload dependency check report
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.event.repository.name }}-dependencycheck-report
-  #       path: dependency-check-report.html
+    - name: Upload dependency check report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}-dependencycheck-report
+        path: dependency-check-report.html
 
   sca:
-    needs: [build, bug_analysis]
+    needs: [build, bug_analysis, dependency_check]
     runs-on: ubuntu-latest
     container:
       image: sonarsource/sonar-scanner-cli:latest
@@ -113,29 +113,17 @@ jobs:
        name: ${{ github.event.repository.name }}-compile-code
        path: .
 
-    - name: check files
-      run: |
-        ls -lh target
-
     - name: Download Bug Report
       uses: actions/download-artifact@v4
       with:
        name: ${{ github.event.repository.name }}-bugreport
        path: target
 
-    - name: check files
-      run: |
-        ls -lh target
-
-    # - name: Download dependency check Report
-    #   uses: actions/download-artifact@v4
-    #   with:
-    #    name: ${{ github.event.repository.name }}-dependencycheck-report
-    #    path: .
-
-    - name: check files
-      run: |
-        ls -lh .
+    - name: Download dependency check Report
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-dependencycheck-report
+       path: .
 
     - name: run static code analysis with sonarqube scanner
       uses: NavabShariff/shared-library/.github/actions/sonarqube-scan@main
@@ -146,56 +134,55 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
-  # docker_build_push:
-  #   needs: [sca]
-  #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     save_docker_image: true
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker_build_push:
+    needs: [sca]
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifact_name: ${{ github.event.repository.name }}
+      save_docker_image: true
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
 
-  # docker_image_scan:
-  #   needs: [docker_build_push]
-  #   uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     critical_threshold: 5
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+  docker_image_scan:
+    needs: [docker_build_push]
+    uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      critical_threshold: 5
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
 
-  # dast:
-  #   needs: [docker_build_push, docker_image_scan]
-  #   uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     image_name: ${{ needs.docker_build_push.outputs.image_name }}
-  #     image_tag: ${{ needs.docker_build_push.outputs.image_tag }}
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  dast:
+    needs: [docker_build_push, docker_image_scan]
+    uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      image_name: ${{ needs.docker_build_push.outputs.image_name }}
+      image_tag: ${{ needs.docker_build_push.outputs.image_tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # trigger_cd:
-  #   needs: [dast]
-  #   uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
-  #   with:
-  #     gitops_repo: "NavabShariff/gitops-source"
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  trigger_cd:
+    needs: [dast]
+    uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
+    with:
+      gitops_repo: "NavabShariff/gitops-source"
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # slack_notification:
-  #   uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
-  #   needs: [pre_checks, build, bug_analysis, dependency_check, sca, docker_build_push, docker_image_scan, dast, trigger_cd]
-  #   if: always()
-  #   with:
-  #     commit_author_name: ${{ github.event.pusher.name }}
-  #     commit_message: ${{ github.event.head_commit.message }}
-  #     commit_id: ${{ github.sha }}
-  #     run_id: ${{ github.run_id }}
-  #   secrets:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  slack_notification:
+    uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
+    needs: [pre_checks, build, bug_analysis, dependency_check, sca, docker_build_push, docker_image_scan, dast, trigger_cd]
+    if: always()
+    with:
+      commit_author_name: ${{ github.event.pusher.name }}
+      commit_message: ${{ github.event.head_commit.message }}
+      commit_id: ${{ github.sha }}
+      run_id: ${{ github.run_id }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
