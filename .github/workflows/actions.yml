@@ -178,7 +178,6 @@ jobs:
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
     needs: [pre_checks]
-    # needs: [pre_checks, build, bug_analysis, dependency_check, sca, docker_build_push, docker_image_scan, dast, trigger_cd]
     if: always()
     with:
       commit_author_name: ${{ github.event.pusher.name }}
