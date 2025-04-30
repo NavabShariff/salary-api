@@ -11,180 +11,174 @@ permissions:
     
 jobs:
         
-  # pre_checks:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: checkout
-  #     uses: actions/checkout@v4
-  #     with:
-  #       path: .
-
-  #   - name: call pre check shared function
-  #     uses: NavabShariff/shared-library/.github/actions/pre-checks@main
-  #     with:
-  #       commit_sign_off: true
-  #       commit_message: false
-  #       credential_scan: true
-  #       license_scanning: false
-  #       license_decision_file: 'dependency_decisions.yml'
-
-  #   - name: upload source code as artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.event.repository.name }}
-  #       path: .
-
-  # build:
-  #   needs: pre_checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Download Source code
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}
-  #      path: .
-
-  #   - name: Call maven build shared function
-  #     uses: NavabShariff/shared-library/.github/actions/java-maven@main
-  #     with:
-  #       java_version: '17'
-  #       mvn_command: clean compile
-
-  #   - name: upload compile code as artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.event.repository.name }}-compile-code
-  #       path: .
-
-  # bug_analysis:
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Download Compile Source code
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}-compile-code
-  #      path: .
-
-  #   - name: run bug analysis
-  #     uses: NavabShariff/shared-library/.github/actions/java-maven@main
-  #     with:
-  #       java_version: '17'
-  #       mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
-
-  #   - name: Upload bug analysis report
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.event.repository.name }}-bugreport
-  #       path: target/*.xml
-
-  # dependency_check:
-  #   needs: [pre_checks]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Download Source code
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}
-  #      path: .
-
-  #   - name: run dependency check
-  #     uses: NavabShariff/shared-library/.github/actions/java-maven@main
-  #     with:
-  #       java_version: '17'
-  #       mvn_command: dependency-check:check
-
-  #   - name: Upload dependency check report
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.event.repository.name }}-dependencycheck-report
-  #       path: dependency-check-report.html
-
-  # sca:
-  #   needs: [build, bug_analysis, dependency_check]
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: sonarsource/sonar-scanner-cli:latest
-  #     options: --user root
-  #   steps:
-  #   - name: Download Compile Source code
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}-compile-code
-  #      path: .
-
-  #   - name: Download Bug Report
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}-bugreport
-  #      path: target
-
-  #   - name: Download dependency check Report
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #      name: ${{ github.event.repository.name }}-dependencycheck-report
-  #      path: .
-
-  #   - name: run static code analysis with sonarqube scanner
-  #     uses: NavabShariff/shared-library/.github/actions/sonarqube-scan@main
-  #     with:
-  #       qualitygate: 'true'
-  #     env:
-  #       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
-  # docker_build_push:
-  #   needs: [sca]
-  #   uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     save_docker_image: true
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-
-
-  # docker_image_scan:
-  #   needs: [docker_build_push]
-  #   uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
-  #   with:
-  #     ecr_repo: 'salary-api'
-  #     aws_region: 'ap-south-1'
-  #     critical_threshold: 5
-  #   secrets:
-  #     AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
-
-  # dast:
-  #   needs: [docker_build_push, docker_image_scan]
-  #   uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
-  #   with: 
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     image_name: ${{ needs.docker_build_push.outputs.image_name }}
-  #     image_tag: ${{ needs.docker_build_push.outputs.image_tag }}
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  # trigger_cd:
-  #   needs: [dast]
-  #   uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
-  #   with:
-  #     gitops_repo: "NavabShariff/gitops-source"
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  test:
+  pre_checks:
     runs-on: ubuntu-latest
     steps:
-    - name: test
-      run: |
-        exit 1
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        path: .
+
+    - name: call pre check shared function
+      uses: NavabShariff/shared-library/.github/actions/pre-checks@main
+      with:
+        commit_sign_off: true
+        commit_message: false
+        credential_scan: true
+        license_scanning: false
+        license_decision_file: 'dependency_decisions.yml'
+
+    - name: upload source code as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}
+        path: .
+
+  build:
+    needs: pre_checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}
+       path: .
+
+    - name: Call maven build shared function
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
+      with:
+        java_version: '17'
+        mvn_command: clean compile
+
+    - name: upload compile code as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}-compile-code
+        path: .
+
+  bug_analysis:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Compile Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-compile-code
+       path: .
+
+    - name: run bug analysis
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
+      with:
+        java_version: '17'
+        mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
+
+    - name: Upload bug analysis report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}-bugreport
+        path: target/*.xml
+
+  dependency_check:
+    needs: [pre_checks]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}
+       path: .
+
+    - name: run dependency check
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
+      with:
+        java_version: '17'
+        mvn_command: dependency-check:check
+
+    - name: Upload dependency check report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}-dependencycheck-report
+        path: dependency-check-report.html
+
+  sca:
+    needs: [build, bug_analysis, dependency_check]
+    runs-on: ubuntu-latest
+    container:
+      image: sonarsource/sonar-scanner-cli:latest
+      options: --user root
+    steps:
+    - name: Download Compile Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-compile-code
+       path: .
+
+    - name: Download Bug Report
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-bugreport
+       path: target
+
+    - name: Download dependency check Report
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-dependencycheck-report
+       path: .
+
+    - name: run static code analysis with sonarqube scanner
+      uses: NavabShariff/shared-library/.github/actions/sonarqube-scan@main
+      with:
+        qualitygate: 'true'
+      env:
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+  docker_build_push:
+    needs: [sca]
+    uses: NavabShariff/shared-library/.github/workflows/docker-login-build-push-ecr.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      download_artifact_name: ${{ github.event.repository.name }}
+      save_docker_image: true
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+
+
+  docker_image_scan:
+    needs: [docker_build_push]
+    uses: NavabShariff/shared-library/.github/workflows/ecr-image-scan.yml@main
+    with:
+      ecr_repo: 'salary-api'
+      aws_region: 'ap-south-1'
+      critical_threshold: 5
+    secrets:
+      AWS_IAM_ROLE_ATHENTICATION: ${{ secrets.AWS_IAM_ROLE_ATHENTICATION }}
+
+  dast:
+    needs: [docker_build_push, docker_image_scan]
+    uses: NavabShariff/shared-library/.github/workflows/dast.yml@main
+    with: 
+      download_artifacts: true
+      download_artifact_name: ${{ github.event.repository.name }}
+      image_name: ${{ needs.docker_build_push.outputs.image_name }}
+      image_tag: ${{ needs.docker_build_push.outputs.image_tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  trigger_cd:
+    needs: [dast]
+    uses: NavabShariff/shared-library/.github/workflows/gitops-update-source-truth.yml@main
+    with:
+      gitops_repo: "NavabShariff/gitops-source"
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
 
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
-    needs: [test]
+    needs: [pre_checks, build, bug_analysis, dependency_check, sca, docker_build_push, docker_image_scan, dast, trigger_cd]
     if: always()
     with:
       commit_author_name: ${{ github.event.pusher.name }}
