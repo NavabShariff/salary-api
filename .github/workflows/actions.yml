@@ -34,7 +34,6 @@ jobs:
         name: ${{ github.event.repository.name }}
         path: .
 
-
   # build:
   #   needs: pre_checks
   #   uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
