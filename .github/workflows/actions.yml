@@ -11,28 +11,28 @@ permissions:
     
 jobs:
         
-  pre_checks:
-    runs-on: ubuntu-latest
-    steps:
-    - name: checkout
-      uses: actions/checkout@v4
-      with:
-        path: .
+  # pre_checks:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: checkout
+  #     uses: actions/checkout@v4
+  #     with:
+  #       path: .
 
-    - name: call pre check shared function
-      uses: NavabShariff/shared-library/.github/actions/pre-checks@main
-      with:
-        commit_sign_off: true
-        commit_message: false
-        credential_scan: true
-        license_scanning: false
-        license_decision_file: 'dependency_decisions.yml'
+  #   - name: call pre check shared function
+  #     uses: NavabShariff/shared-library/.github/actions/pre-checks@main
+  #     with:
+  #       commit_sign_off: true
+  #       commit_message: false
+  #       credential_scan: true
+  #       license_scanning: false
+  #       license_decision_file: 'dependency_decisions.yml'
 
-    - name: upload source code as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ github.event.repository.name }}
-        path: .
+  #   - name: upload source code as artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: ${{ github.event.repository.name }}
+  #       path: .
 
   # build:
   #   needs: pre_checks
@@ -175,9 +175,16 @@ jobs:
   #   secrets:
   #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: test
+      run: |
+        echo "Hello"
+        
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
-    needs: [pre_checks]
+    needs: test
     if: always()
     with:
       commit_author_name: ${{ github.event.pusher.name }}
