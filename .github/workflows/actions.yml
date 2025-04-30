@@ -31,7 +31,9 @@ jobs:
     - name: check files
       run: |
         ls -lh .
-        ls -la .
+        ls -lha .
+
+        ls -lh target/
         
     - name: upload source code as artifact
       uses: actions/upload-artifact@v4
