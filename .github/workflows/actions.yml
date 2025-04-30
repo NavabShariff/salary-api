@@ -124,11 +124,11 @@ jobs:
       run: |
         ls -lh target
 
-    - name: Download dependency check Report
-      uses: actions/download-artifact@v4
-      with:
-       name: ${{ github.event.repository.name }}-dependencycheck-report
-       path: .
+    # - name: Download dependency check Report
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #    name: ${{ github.event.repository.name }}-dependencycheck-report
+    #    path: .
 
     - name: check files
       run: |
