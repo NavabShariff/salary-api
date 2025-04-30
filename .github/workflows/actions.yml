@@ -180,7 +180,7 @@ jobs:
     steps:
     - name: test
       run: |
-        echo "hello"
+        exit 1
 
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
