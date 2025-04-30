@@ -28,6 +28,11 @@ jobs:
         license_scanning: true
         license_decision_file: 'dependency_decisions.yml'
 
+    - name: check files
+      run: |
+        ls -lh .
+        ls -la .
+        
     - name: upload source code as artifact
       uses: actions/upload-artifact@v4
       with:
