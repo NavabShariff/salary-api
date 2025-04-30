@@ -25,15 +25,8 @@ jobs:
         commit_sign_off: true
         commit_message: false
         credential_scan: true
-        license_scanning: true
+        license_scanning: false
         license_decision_file: 'dependency_decisions.yml'
-
-    - name: check files
-      run: |
-        ls -lh .
-        ls -lha .
-
-
 
     - name: upload source code as artifact
       uses: actions/upload-artifact@v4
@@ -41,19 +34,37 @@ jobs:
         name: ${{ github.event.repository.name }}
         path: .
 
+  build:
+    needs: pre_checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}
+       path: .
 
+    - name: Call maven build shared function
+      uses: NavabShariff/shared-library/.github/actions/maven-build@main
+      with:
+        java_version: '17'
+        mvn_command: clean compile
 
-  # build:
-  #   needs: pre_checks
-  #   uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
-  #   with:
-  #     checkout: false
-  #     download_artifacts: true
-  #     download_artifact_name: ${{ github.event.repository.name }}
-  #     java_version: '17'
-  #     mvn_command: clean compile -DskipTests
-  #     upload_artifacts: true
-  #     upload_artifact_name: ${{ github.event.repository.name }}-compile-code
+    - name:  check file
+      run: |
+        ls -lh
+        ls -lh target/
+
+ 
+    # uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
+    # with:
+    #   checkout: false
+    #   download_artifacts: true
+    #   download_artifact_name: ${{ github.event.repository.name }}
+    #   java_version: '17'
+    #   mvn_command: clean compile -DskipTests
+    #   upload_artifacts: true
+    #   upload_artifact_name: ${{ github.event.repository.name }}-compile-code
 
   # bug_analysis:
   #   needs: build
