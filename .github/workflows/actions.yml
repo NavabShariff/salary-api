@@ -28,6 +28,7 @@ jobs:
 
         
   pre_checks:
+    needs: clone
     runs-on: ubuntu-latest
     steps:
     - name: Download Source code
