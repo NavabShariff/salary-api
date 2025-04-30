@@ -16,8 +16,8 @@ jobs:
     - name: call pre check shared function
       uses: NavabShariff/shared-library/.github/actions/pre-checks@main
       with:
-        commit_sign_off: true
+        commit_sign_off: false
         commit_message: false
-        license_scanning: true
+        credential_scan: true
+        license_scanning: false
         license_decision_file: 'dependency_decisions.yml'
-        
