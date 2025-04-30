@@ -45,28 +45,42 @@ jobs:
        path: .
 
     - name: Call maven build shared function
-      uses: NavabShariff/shared-library/.github/actions/maven-build@main
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
       with:
         java_version: '17'
         mvn_command: clean compile
 
-    - name:  check file
+    - name: upload compile code as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}-compile-code
+        path: .
+
+  bug_analysis:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Compile Source code
+      uses: actions/download-artifact@v4
+      with:
+       name: ${{ github.event.repository.name }}-compile-code
+       path: .
+
+    - name: check files
       run: |
         ls -lh
         ls -lh target/
 
+    - name: run bug analysis
+      uses: NavabShariff/shared-library/.github/actions/java-maven@main
+      with:
+        java_version: '17'
+        mvn_command: com.github.spotbugs:spotbugs-maven-plugin:check
 
- 
-    # uses: NavabShariff/shared-library/.github/workflows/maven-build.yml@main
-    # with:
-    #   checkout: false
-    #   download_artifacts: true
-    #   download_artifact_name: ${{ github.event.repository.name }}
-    #   java_version: '17'
-    #   mvn_command: clean compile -DskipTests
-    #   upload_artifacts: true
-    #   upload_artifact_name: ${{ github.event.repository.name }}-compile-code
-
+    - name: check files
+      run: |
+        ls -lh target/
+     
   # bug_analysis:
   #   needs: build
   #   uses: NavabShariff/shared-library/.github/workflows/bug-analysis.yml@main
