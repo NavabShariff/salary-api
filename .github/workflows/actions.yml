@@ -103,6 +103,9 @@ jobs:
   sca:
     needs: [build, bug_analysis]
     runs-on: ubuntu-latest
+    container:
+      image: sonarsource/sonar-scanner-cli:latest
+      options: --user root
     steps:
     - name: Download Compile Source code
       uses: actions/download-artifact@v4
