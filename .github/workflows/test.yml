@@ -20,3 +20,4 @@ jobs:
         commit_message: false
         license_scanning: true
         license_decision_file: 'dependency_decisions.yml'
+        
