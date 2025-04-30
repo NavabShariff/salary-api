@@ -180,7 +180,7 @@ jobs:
     steps:
     - name: test
       run: |
-        exit 1
+        echo "hello"
 
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
@@ -191,6 +191,10 @@ jobs:
       commit_message: ${{ github.event.head_commit.message }}
       commit_id: ${{ github.sha }}
       run_id: ${{ github.run_id }}
+      workflow_status: >-
+        ${{
+          contains(join(needs.*.result, ','), 'failure') && 'failure' || 'success'
+        }}
     secrets:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
