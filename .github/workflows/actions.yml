@@ -38,7 +38,7 @@ jobs:
         path: .
 
     - name: call pre check shared function
-      uses: NavabShariff/shared-library/.github/actions/pre-checks@main
+      uses: NavabShariff/shared-library/.github/actions/pre-checks@v1
       with:
         commit_sign_off: true
         commit_message: false
