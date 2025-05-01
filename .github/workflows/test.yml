@@ -25,9 +25,8 @@ jobs:
         commit_sign_off: false
         commit_message: false
         credential_scan: true
-        license_scanning: false
+        license_scanning: true
         license_decision_file: 'dependency_decisions.yml'
-
 
 
     - name: upload source code as artifact
