@@ -1,0 +1,35 @@
+name: Salary API CI CD pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+
+permissions:
+    id-token: write
+    packages: write
+    
+jobs:
+        
+  pre_checks:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        path: .
+
+    - name: call pre check shared function
+      uses: NavabShariff/shared-library/.github/actions/pre-checks@main
+      with:
+        commit_sign_off: true
+        commit_message: false
+        credential_scan: true
+        license_scanning: false
+        license_decision_file: 'dependency_decisions.yml'
+
+    - name: upload source code as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}
+        path: .
