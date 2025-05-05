@@ -19,6 +19,11 @@ jobs:
       with:
         path: .
 
+    - name: Setup Maven ${{ inputs.maven_version }}
+      uses: s4u/setup-maven-action@v1.5.0
+      with:
+        maven-version: 3.8.0
+
     - name: test mvn version
       run: |
         mvn --version
