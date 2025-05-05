@@ -19,18 +19,6 @@ jobs:
       with:
         path: .
 
-    - name: call pre check shared function
-      uses: NavabShariff/shared-library/.github/actions/pre-checks@main
-      with:
-        commit_sign_off: false
-        commit_message: false
-        credential_scan: true
-        license_scanning: true
-        license_decision_file: 'dependency_decisions.yml'
-
-
-    - name: upload source code as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ github.event.repository.name }}
-        path: .
+    - name: test mvn version
+      run: |
+        mvn --version
