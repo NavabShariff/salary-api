@@ -21,7 +21,7 @@ jobs:
 
     - name: test
       run: |
-        exit 1
+        sleep 6000
 
   slack_notification:
     uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
