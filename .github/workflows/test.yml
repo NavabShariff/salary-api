@@ -19,13 +19,24 @@ jobs:
       with:
         path: .
 
-
-    - name: Setup Maven 
-      uses: s4u/setup-maven-action@v1.5.0
-      with:
-        maven-version: 3.9.0
-        java-version: 17
-
-    - name: test mvn version
+    - name: test
       run: |
-        mvn --version
+        echo "hello"
+
+  slack_notification:
+    uses: NavabShariff/shared-library/.github/workflows/slack-alert.yml@main
+    needs: ['pre_checks']
+    if: always()
+    with:
+      commit_author_name: ${{ github.event.pusher.name }}
+      commit_message: ${{ github.event.head_commit.message }}
+      commit_id: ${{ github.sha }}
+      run_id: ${{ github.run_id }}
+      workflow_status: >-
+        ${{
+          contains(join(needs.*.result, ','), 'failure') && 'failure' ||
+          contains(join(needs.*.result, ','), 'cancelled') && 'abort' ||
+          'success'
+        }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
