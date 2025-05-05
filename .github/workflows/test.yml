@@ -19,16 +19,12 @@ jobs:
       with:
         path: .
 
-    - name: Set up JDK 
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
 
     - name: Setup Maven 
       uses: s4u/setup-maven-action@v1.5.0
       with:
         maven-version: 3.9.0
+        java-version: 17
 
     - name: test mvn version
       run: |
